@@ -2629,6 +2629,8 @@ public class ODatabaseDocumentTx extends OListenerManger<ODatabaseListener> impl
 
   @Override
   public ODatabaseDocument commit(boolean force) throws OTransactionException {
+    OLogManager.instance().info(this, "Starting commit");
+
     checkOpeness();
     checkIfActive();
 
@@ -2696,6 +2698,8 @@ public class ODatabaseDocumentTx extends OListenerManger<ODatabaseListener> impl
             t, OTransactionBlockedException.class, listener.getClass());
       }
 
+    OLogManager.instance().info(this, "Finished commit");
+    
     return this;
   }
 

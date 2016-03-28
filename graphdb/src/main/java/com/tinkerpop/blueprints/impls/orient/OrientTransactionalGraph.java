@@ -20,6 +20,7 @@
 
 package com.tinkerpop.blueprints.impls.orient;
 
+import com.orientechnologies.common.log.OLogManager;
 import org.apache.commons.configuration.Configuration;
 
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
@@ -153,6 +154,8 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
    * Commits the current active transaction.
    */
   public void commit() {
+    OLogManager.instance().info(this, "Starting commit");
+
     makeActive();
 
     if (database == null)
@@ -161,6 +164,8 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     database.commit();
     if (isAutoStartTx())
       ensureTransaction();
+
+    OLogManager.instance().info(this, "Finished commit");
   }
 
   /**
