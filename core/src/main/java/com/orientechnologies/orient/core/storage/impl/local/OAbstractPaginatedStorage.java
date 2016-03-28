@@ -1151,6 +1151,9 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
   }
 
   public void commit(final OTransaction clientTx, Runnable callback) {
+    long startTime = System.currentTimeMillis();
+    OLogManager.instance().info(this, "Starting commit");
+
     checkOpeness();
     checkLowDiskSpaceAndFullCheckpointRequests();
 
@@ -1195,8 +1198,13 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
 
             }
 
-            if (callback != null)
+            if (callback != null) {
+              OLogManager.instance().info(this, "Callback is a %s", callback.getClass());
+              long callbackStart = System.currentTimeMillis();
+              OLogManager.instance().info(this, "Starting callback");
               callback.run();
+              OLogManager.instance().info(this, "Finished callback in %d", System.currentTimeMillis() - callbackStart);
+            }
 
             endStorageTx();
 
@@ -1226,6 +1234,8 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
     } finally {
       stateLock.releaseReadLock();
     }
+
+    OLogManager.instance().info(this, "Finished commit in %d", System.currentTimeMillis()-startTime);
   }
 
   public void rollback(final OTransaction clientTx) {
