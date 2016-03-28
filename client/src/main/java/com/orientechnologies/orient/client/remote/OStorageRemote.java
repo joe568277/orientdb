@@ -123,9 +123,6 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
   private ORemoteServerEventListener    asynchEventListener;
   private String                        connectionDbType;
 
-  private volatile String connectionUserName;
-
-  private String              connectionUserPassword;
   private Map<String, Object> connectionOptions;
   private OEngineRemote       engine;
   private String              recordFormat;
@@ -215,8 +212,8 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
     stateLock.acquireWriteLock();
     try {
 
-      connectionUserName = iUserName;
-      connectionUserPassword = iUserPassword;
+      OStorageRemoteThreadLocal.INSTANCE.get().connectionUserName = iUserName;
+      OStorageRemoteThreadLocal.INSTANCE.get().connectionUserPassword = iUserPassword;
       connectionOptions = iOptions != null ? new HashMap<String, Object>(iOptions) : null; // CREATE A COPY TO AVOID USER
       // MANIPULATION
       // POST OPEN
@@ -298,11 +295,15 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
 
     OChannelBinaryAsynchClient network = null;
 
+    if(getSessionId() == -1)
+      //SESSION ALREADY CLOSED, DO NOTHING
+      return;
+
+
     stateLock.acquireWriteLock();
     try {
       if (status == STATUS.CLOSED)
         return;
-
       network = beginRequest(OChannelBinaryProtocol.REQUEST_DB_CLOSE);
       try {
         setSessionId(null, -1, null);
@@ -1753,7 +1754,7 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
 
   @Override
   public String getUserName() {
-    return connectionUserName;
+    return OStorageRemoteThreadLocal.INSTANCE.get().connectionUserName;
   }
 
   /**
@@ -1878,8 +1879,8 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
             if (network.getSrvProtocolVersion() >= 8)
               network.writeString(connectionDbType);
 
-            network.writeString(connectionUserName);
-            network.writeString(connectionUserPassword);
+            network.writeString(getUserName());
+            network.writeString(getUserPassword());
 
           } finally {
             endRequest(network);
@@ -2404,5 +2405,9 @@ public class OStorageRemote extends OStorageAbstract implements OStorageProxy {
       }
     }
     return false;
+  }
+
+  public String getUserPassword() {
+    return OStorageRemoteThreadLocal.INSTANCE.get().connectionUserPassword;
   }
 }
