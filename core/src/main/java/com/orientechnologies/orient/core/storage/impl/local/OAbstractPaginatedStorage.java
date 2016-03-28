@@ -1185,6 +1185,7 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
 
             final List<ORecordOperation> tmpEntries = new ArrayList<ORecordOperation>();
 
+            final long modLoopStart = System.currentTimeMillis();
             while (clientTx.getCurrentRecordEntries().iterator().hasNext()) {
               for (ORecordOperation txEntry : clientTx.getCurrentRecordEntries())
                 tmpEntries.add(txEntry);
@@ -1203,9 +1204,9 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
                 commitEntry(clientTx, txEntry);
 
             }
+            OLogManager.instance().info(this, "Modification loop completed in %d", System.currentTimeMillis() - modLoopStart);
 
             if (callback != null) {
-              OLogManager.instance().info(this, "Callback is a %s", callback.getClass());
               long callbackStart = System.currentTimeMillis();
               OLogManager.instance().info(this, "Starting callback");
               callback.run();

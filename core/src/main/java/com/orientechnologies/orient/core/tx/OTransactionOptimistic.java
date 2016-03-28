@@ -142,9 +142,6 @@ public class OTransactionOptimistic extends OTransactionRealAbstract {
    */
   @Override
   public void commit(final boolean force) {
-    long startTime = System.currentTimeMillis();
-    OLogManager.instance().info(this, "Starting commit");
-
     checkTransaction();
 
     if (txStartCounter < 0)
@@ -161,8 +158,6 @@ public class OTransactionOptimistic extends OTransactionRealAbstract {
       OLogManager.instance().debug(this, "Nested transaction was closed but transaction itself was not committed.");
     else
       throw new OTransactionException("Transaction was committed more times than it is started.");
-
-    OLogManager.instance().info(this, "Finished commit in %d", System.currentTimeMillis()-startTime);
   }
 
   @Override
@@ -587,9 +582,6 @@ public class OTransactionOptimistic extends OTransactionRealAbstract {
   }
 
   private void doCommit() {
-    long startTime = System.currentTimeMillis();
-    OLogManager.instance().info(this, "Starting doCommit");
-
     if (status == TXSTATUS.ROLLED_BACK || status == TXSTATUS.ROLLBACKING)
       throw new ORollbackException("Given transaction was rolled back and cannot be used.");
 
@@ -632,8 +624,6 @@ public class OTransactionOptimistic extends OTransactionRealAbstract {
     close();
 
     status = TXSTATUS.COMPLETED;
-
-    OLogManager.instance().info(this, "Finished doCommit in %d", System.currentTimeMillis()-startTime);
   }
 
   private List<OIndexAbstract<?>> acquireIndexLocks() {

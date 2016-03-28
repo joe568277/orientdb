@@ -2629,9 +2629,6 @@ public class ODatabaseDocumentTx extends OListenerManger<ODatabaseListener> impl
 
   @Override
   public ODatabaseDocument commit(boolean force) throws OTransactionException {
-    long startTime = System.currentTimeMillis();
-    OLogManager.instance().info(this, "Starting commit");
-
     checkOpeness();
     checkIfActive();
 
@@ -2698,8 +2695,6 @@ public class ODatabaseDocumentTx extends OListenerManger<ODatabaseListener> impl
             "Error after the transaction has been committed. The transaction remains valid. The exception caught was on execution of %s.onAfterTxCommit()",
             t, OTransactionBlockedException.class, listener.getClass());
       }
-
-    OLogManager.instance().info(this, "Finished commit in %d", System.currentTimeMillis()-startTime);
 
     return this;
   }
