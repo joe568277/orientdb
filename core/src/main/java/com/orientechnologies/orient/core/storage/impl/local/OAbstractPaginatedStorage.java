@@ -1157,16 +1157,21 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
     checkOpeness();
     checkLowDiskSpaceAndFullCheckpointRequests();
 
+    OLogManager.instance().info(this, "Performed checks, elapsed %d", System.currentTimeMillis() - startTime);
+
     final ODatabaseDocumentInternal databaseRecord = ODatabaseRecordThreadLocal.INSTANCE.get();
     if (databaseRecord != null)
       ((OMetadataInternal) databaseRecord.getMetadata()).makeThreadLocalSchemaSnapshot();
 
     stateLock.acquireReadLock();
+    OLogManager.instance().info(this, "acquireReadLock() done, elapsed %d", System.currentTimeMillis() - startTime);
     try {
       try {
         modificationLock.requestModificationLock();
+        OLogManager.instance().info(this, "requestModificationLock() done, elapsed %d", System.currentTimeMillis() - startTime);
         try {
           dataLock.acquireExclusiveLock();
+          OLogManager.instance().info(this, "acquireExclusiveLock() done, elapsed %d", System.currentTimeMillis() - startTime);
           try {
 
             checkOpeness();
@@ -1176,6 +1181,7 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
 
             makeStorageDirty();
             startStorageTx(clientTx);
+            OLogManager.instance().info(this, "startStorageTx() done, elapsed %d", System.currentTimeMillis() - startTime);
 
             final List<ORecordOperation> tmpEntries = new ArrayList<ORecordOperation>();
 
@@ -1205,11 +1211,13 @@ public abstract class OAbstractPaginatedStorage extends OStorageAbstract
               callback.run();
               OLogManager.instance().info(this, "Finished callback in %d", System.currentTimeMillis() - callbackStart);
             }
+            OLogManager.instance().info(this, "Callback done, elapsed %d", System.currentTimeMillis() - startTime);
 
             endStorageTx();
+            OLogManager.instance().info(this, "endStorageTx() done, elapsed %d", System.currentTimeMillis() - startTime);
 
             OTransactionAbstract.updateCacheFromEntries(clientTx, clientTx.getAllRecordEntries(), true);
-
+            OLogManager.instance().info(this, "updateCacheFromEntries() done, elapsed %d", System.currentTimeMillis() - startTime);
           } catch (Exception e) {
             // WE NEED TO CALL ROLLBACK HERE, IN THE LOCK
             OLogManager.instance()
