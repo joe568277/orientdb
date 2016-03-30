@@ -155,7 +155,7 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
    */
   public void commit() {
     long startTime = System.currentTimeMillis();
-    OLogManager.instance().info(this, "Starting commit");
+    //OLogManager.instance().info(this, "Starting commit");
 
     makeActive();
 
@@ -166,7 +166,7 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     if (isAutoStartTx())
       ensureTransaction();
 
-    OLogManager.instance().info(this, "Finished commit in %d", System.currentTimeMillis()-startTime);
+    //OLogManager.instance().info(this, "Finished commit in %d", System.currentTimeMillis()-startTime);
   }
 
   /**

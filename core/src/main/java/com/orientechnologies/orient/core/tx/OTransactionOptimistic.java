@@ -602,7 +602,7 @@ public class OTransactionOptimistic extends OTransactionRealAbstract {
 
           final String storageType = database.getStorage().getUnderlying().getType();
 
-          OLogManager.instance().info(this, "Database underlying storage type is %s, class %s", storageType, database.getStorage().getClass());
+          //OLogManager.instance().info(this, "Database underlying storage type is %s, class %s", storageType, database.getStorage().getClass());
 
           if (storageType.equals(OEngineLocalPaginated.NAME) || storageType.equals(OEngineMemory.NAME))
             database.getStorage().commit(OTransactionOptimistic.this, callback);
