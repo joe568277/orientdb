@@ -89,18 +89,15 @@ public class OStorageRemoteThread implements OStorageProxy {
   public void open(final String iUserName, final String iUserPassword, final Map<String, Object> iOptions) {
     pushSession();
     try {
+      this.connectionUserName = iUserName;
+      this.connectionUserPassword = iUserPassword;
       delegate.open(iUserName, iUserPassword, iOptions);
+    } catch (RuntimeException e) {
+      Orient.instance().unregisterStorage(this);
+      throw e;
     } finally {
       popSession();
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public OModificationLock getModificationLock() {
-    return null;
   }
 
   @Override
